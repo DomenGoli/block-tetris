@@ -1,0 +1,70 @@
+"use client";
+
+import Board from "./Board";
+import Choices from "./Choices";
+import { useAppDispatch, useAppSelector } from "../_lib/redux/hooks";
+import { useEffect, useState } from "react";
+import { populatePool } from "../_lib/redux/choicesSlice";
+import { shapesList } from "../_lib/shapeList";
+import { getRandomShapes } from "../_lib/helper";
+import { resetBoard } from "../_lib/redux/boardSlice";
+import { resetGame } from "../_lib/redux/gameSlice";
+
+function Game() {
+    const [rerenderBoard, forceRerenderBoard] = useState(Math.random);
+    const dispatch = useAppDispatch();
+    const { isGameOver, score, highScore, newHighScore } = useAppSelector(
+        (store) => store.game,
+    );
+    const numberOfUniqueShapes = shapesList.length;
+
+    function handleClick() {
+        dispatch(resetGame());
+        dispatch(resetBoard());
+        forceRerenderBoard(Math.random())
+
+    }
+
+    useEffect(
+        function () {
+            const randomShapesList = getRandomShapes();
+            dispatch(populatePool(randomShapesList));
+        },
+        [dispatch, numberOfUniqueShapes, rerenderBoard],
+    );
+
+    return (
+        <div className="w-screen h-screen flex items-center mt-20 flex-col gap-10">
+            <div className="flex gap-17">
+                <div className="flex flex-col items-center gap-10">
+                    <div className="w-104">
+                        <Board key={rerenderBoard}/>
+                    </div>
+                    <Choices />
+                </div>
+                <div className="flex flex-col gap-16 w-50">
+                    <div>
+                        <p className="text-2xl">Score: {score}</p>
+                        <p className="text-2xl">High Score: {highScore}</p>
+                    </div>
+                    <div>
+                        {isGameOver && <p className="text-4xl">Game Over</p>}
+                        {isGameOver && newHighScore && (
+                            <p className="text-2xl">New High Score</p>
+                        )}
+                        {isGameOver && (
+                            <button
+                                onClick={handleClick}
+                                className="border-2 cursor-pointer rounded-2xl p-3"
+                            >
+                                New Game
+                            </button>
+                        )}
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+export default Game;
