@@ -37,7 +37,7 @@ const gameSlice = createSlice({
             localStorage.setItem("highScore", JSON.stringify(state.highScore));
         },
         resetGame() {
-            return { ...initialState };
+            return { ...initialState, highScore: loadHighScore() };
         },
     },
 });
