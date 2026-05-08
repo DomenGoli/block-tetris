@@ -4,7 +4,7 @@ import Board from "./Board";
 import Choices from "./Choices";
 import { useAppDispatch, useAppSelector } from "../_lib/redux/hooks";
 import { useEffect, useState } from "react";
-import { populatePool } from "../_lib/redux/choicesSlice";
+import { enableMulligan, populatePool } from "../_lib/redux/choicesSlice";
 import { shapesList } from "../_lib/shapeList";
 import { getRandomShapes } from "../_lib/helper";
 import { resetBoard } from "../_lib/redux/boardSlice";
@@ -19,6 +19,7 @@ function Game() {
     const numberOfUniqueShapes = shapesList.length;
 
     function handleClick() {
+        dispatch(enableMulligan())
         dispatch(resetGame());
         dispatch(resetBoard());
         forceRerenderBoard(Math.random())

@@ -6,7 +6,7 @@ import {
     setVirtualBoard,
 } from "../_lib/redux/boardSlice";
 import { useAppDispatch, useAppSelector } from "../_lib/redux/hooks";
-import {  populatePool } from "../_lib/redux/choicesSlice";
+import {  disableMulligan, enableMulligan, populatePool } from "../_lib/redux/choicesSlice";
 import { getRandomShapes } from "../_lib/helper";
 import {
     changeBoardColor,
@@ -480,6 +480,12 @@ function Cell({
      * @function commitShape
      */
     function commitShape() {
+        /**
+         * Clause guards
+         */
+        if(activeShape.name === "blank") return
+        if (isOverlap) return;
+
         const blankShape = {
             name: "blank",
             template: [
@@ -487,7 +493,7 @@ function Cell({
                 [0, 0],
             ],
         };
-        if (isOverlap) return;
+
         const columnComplete = isColumnComplete(virtualBoard);
         const completedColums = columnComplete.columns;
         const numberOfCompletedColumns = completedColums.length;
@@ -496,6 +502,7 @@ function Cell({
          * za vsak upseno commitan shape dodamo tocke
          */
         dispatch(addToScore(points.commitShape));
+        dispatch(disableMulligan())
 
         if (isRowComplete(virtualBoard) && columnComplete.isComplete) {
             /**
@@ -572,6 +579,7 @@ function Cell({
             poolRef.current = randomShapesList;
 
             dispatch(populatePool(randomShapesList));
+            dispatch(enableMulligan())
         } else dispatch(populatePool(newPool));
         dispatch(setIndex(null));
         setIsOverlap(false);

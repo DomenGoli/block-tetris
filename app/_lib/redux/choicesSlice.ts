@@ -9,14 +9,16 @@ type ShapeType = {
 
 type InitialStateType = {
     numberOfShapes:number;
-    pool: ShapeType[]
+    pool: ShapeType[];
+    isMulliganActive: boolean;
 }
 
 
 //Initial State
 const initialState:InitialStateType = {
     numberOfShapes:3,
-    pool: []
+    pool: [],
+    isMulliganActive: true,
 }
 
 //Reducer
@@ -29,11 +31,17 @@ const choicesSlice = createSlice({
         },
         populatePool(state,action){
             state.pool = action.payload
-        }
+        },
+        disableMulligan(state){
+            state.isMulliganActive = false
+        },
+        enableMulligan(state){
+            state.isMulliganActive = true
+        },
     }
 })
 
 //Export
 export default choicesSlice.reducer
-export const {decreaseChoiceNumber, populatePool} = choicesSlice.actions
+export const {decreaseChoiceNumber, populatePool, disableMulligan, enableMulligan} = choicesSlice.actions
 

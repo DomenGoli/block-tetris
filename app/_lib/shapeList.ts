@@ -1,10 +1,12 @@
 export const shapesList = [
     {   
         name: "block4",
+        id: 1,
         weight: 0.5,
         directions: [
             {
                 name: "block4",
+                id: 1,
                 template: [
                     [1, 1],
                     [1, 1],
@@ -15,9 +17,11 @@ export const shapesList = [
 
     {   name: "block9",
         weight: 0.5,
+        id: 2,
         directions: [
             {
                 name: "block9",
+                id: 2,
                 template: [
                     [1, 1, 1],
                     [1, 1, 1],
@@ -28,10 +32,12 @@ export const shapesList = [
     },
 
     {   name: "i2",
+        id: 3,
         weight: 0.5,
         directions: [
             {
                 name: "i2-vertical",
+                id: 3,
                 template: [[1], [1]],
             },
             {
@@ -113,7 +119,7 @@ export const shapesList = [
         weight: 0.5,
         directions: [
             {
-                name: "z-horizontal",
+                name: "Z-horizontal",
                 template: [
                     [1, 1, 0],
                     [0, 1, 1],
@@ -168,11 +174,11 @@ export const shapesList = [
     },
 
     {
-        name: "L-sec",
+        name: "Lsec",
         weight: 0.5,
         directions: [
             {
-                name: "L-sec-00",
+                name: "Lsec-00",
                 template: [
                     [0, 1],
                     [0, 1],
@@ -180,7 +186,7 @@ export const shapesList = [
                 ],
             },
             {
-                name: "L-sec-180",
+                name: "Lsec-180",
                 template: [
                     [1, 1],
                     [1, 0],
@@ -188,14 +194,14 @@ export const shapesList = [
                 ],
             },
             {
-                name: "L-sec-270",
+                name: "Lsec-270",
                 template: [
                     [1, 1, 1],
                     [0, 0, 1],
                 ],
             },
             {
-                name: "L-sec-90",
+                name: "Lsec-90",
                 template: [
                     [1, 0, 0],
                     [1, 1, 1],
@@ -277,11 +283,11 @@ export const shapesList = [
     },
 
     {   
-        name: "L-big",
+        name: "Lbig",
         weight: 0.5,
         directions: [
             {
-                name: "L-big-00",
+                name: "big-00",
                 template: [
                     [0, 0, 1],
                     [0, 0, 1],
@@ -289,7 +295,7 @@ export const shapesList = [
                 ],
             },
             {
-                name: "L-big-90",
+                name: "Lbig-90",
                 template: [
                     [1, 0, 0],
                     [1, 0, 0],
@@ -297,7 +303,7 @@ export const shapesList = [
                 ],
             },
             {
-                name: "L-big-180",
+                name: "Lbig-180",
                 template: [
                     [1, 1, 1],
                     [1, 0, 0],
@@ -305,7 +311,7 @@ export const shapesList = [
                 ],
             },
             {
-                name: "L-big-270",
+                name: "Lbig-270",
                 template: [
                     [1, 1, 1],
                     [0, 0, 1],
