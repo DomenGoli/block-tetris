@@ -1,4 +1,8 @@
-export const shapeWeight = {
+type ShapeWeightType = {
+    [key: string]: number,
+}
+
+export const shapeWeight:ShapeWeightType = {
     "block4": 0.5,
     "block6": 0.5,
     "block9": 0.2,

@@ -1,6 +1,7 @@
 import { shapesList } from "./shapeList";
 import { shapeWeight } from "./shapeWeight";
 
+
 export function getRandomIndex(numOfElements: number) {
     return Math.floor(Math.random() * numOfElements);
 }
