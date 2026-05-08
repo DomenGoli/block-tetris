@@ -1,4 +1,3 @@
-"use client"
 import { createSlice } from "@reduxjs/toolkit";
 
 type initialState = {
@@ -9,8 +8,10 @@ type initialState = {
 };
 
 function loadHighScore(): number {
-    const storedValue = localStorage?.getItem("highScore");
-    return storedValue ? Number(JSON.parse(storedValue)) : 0;
+    if (typeof window !== "undefined") {
+        const storedValue = localStorage?.getItem("highScore");
+        return storedValue ? Number(JSON.parse(storedValue)) : 0;
+    } else return 0;
 }
 
 const initialState = {
