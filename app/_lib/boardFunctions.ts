@@ -16,7 +16,6 @@ export function changeBoardColor(board: number[][]) {
     }
 
 export function isColumnComplete(board:number[][]): { isComplete: boolean; columns: number[] } {
-        // return isRowComplete(rotateBoard(virtualBoard))
         const completedColums = [];
         let prazna = 0;
         for (let x = 0; x < board[0].length; x++) {
@@ -24,9 +23,7 @@ export function isColumnComplete(board:number[][]): { isComplete: boolean; colum
             for (let y = 0; y < board.length; y++) {
                 if (board[y][x] === 0) prazna++;
             }
-            // if (!prazna) return true;
             if (prazna === 0) completedColums.push(x);
-            // console.log("sdfsf");
         }
         if (completedColums.length > 0)
             return { isComplete: true, columns: completedColums };
@@ -45,22 +42,49 @@ export function isSnapshotFreeSpace(snapShot: number[], shape: number[][]) {
     return true
 }
 
-export function deleteCompletedRows(board: number[][]): {newBoardDeletedRows:number[][], numberOfCompletedRows: number}  {
+function isOverlap(board: number[][]): boolean {
+    return board.flat().includes(3)
+}
+
+export function modifyCompletedRows(board: number[][], modifier=0): {newBoardModifiedRows:number[][], numberOfCompletedRows: number}  {
     let numberOfCompletedRows = 0;
-    const newBoardDeletedRows = board.map((row) => {
+    if(modifier && isOverlap(board)) return {newBoardModifiedRows: board, numberOfCompletedRows};
+    
+    const newBoardModifiedRows = board.map((row) => {
                 if (row.includes(0)) return row;
                 else {
                     numberOfCompletedRows++
-                    return row.map(() => 0);
+                    return row.map(() => modifier);
                 } 
             });
-    return {newBoardDeletedRows, numberOfCompletedRows}
+    return {newBoardModifiedRows, numberOfCompletedRows}
 }
 
-export function deleteCompletedColumns(board: number[][], completedColumns: number[]): number[][] {
+export function modifyCompletedColumns(board: number[][], completedColumns: number[], modifier=0): number[][] {
+    if(modifier && isOverlap(board)) return board.map(row=> {
+        return row.map(cell => {
+            if(cell === 4) return 1
+            else return cell
+        })
+    });
+
     return board.map(row=> {
         return row.map((cell, i) => {
-            if(completedColumns.includes(i)) return 0;
+            // Fix za brisanje potencialno completed rows ko premikamo lik po X osi
+            if(!isRowComplete(board) && !completedColumns.includes(i)) {
+                if(cell === 4) return 1
+            }
+
+            // ZBriSI
+            // if(!isColumnComplete(board).isComplete) {
+            //     if(cell === 4) return 1
+            // }
+            // Fix za brisanje potencialno completed rows ko premikamo lik po Y osi
+            // if(board.flat().includes(2)) {
+            //     if(cell === 4) return 1
+            // };
+
+            if(completedColumns.includes(i)) return modifier;
             else return cell;
         })
     })

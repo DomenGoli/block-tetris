@@ -10,8 +10,8 @@ import {  disableMulligan, enableMulligan, populatePool } from "../_lib/redux/ch
 import { getRandomShapes } from "../_lib/helper";
 import {
     changeBoardColor,
-    deleteCompletedColumns,
-    deleteCompletedRows,
+    modifyCompletedColumns,
+    modifyCompletedRows,
     isColumnComplete,
     isRowComplete,
     isSnapshotFreeSpace,
@@ -40,7 +40,7 @@ function Cell({
     coords,
     board,
     onSetBoard,
-    color = "white",
+    color = "black",
 }: CellProps) {
     const dispatch = useAppDispatch();
     const {
@@ -147,7 +147,8 @@ function Cell({
         setIsOverlap(false);
         if (activeShape.name === "blank") return;
 
-        const newBoard2 = virtualBoard.map((row, y) => {
+
+        const newVirtualBoard = virtualBoard.map((row, y) => {
             function isShapeBlock(
                 shapeRow: number,
                 shapeColumn: number,
@@ -462,8 +463,16 @@ function Cell({
                 } else return row;
             } else return row;
         });
-        onSetBoard(newBoard2);
-        dispatch(setVirtualBoard(newBoard2));
+        const columnComplete = isColumnComplete(newVirtualBoard);
+        const completedColums = columnComplete.columns;
+
+        //1. check rows
+        const {newBoardModifiedRows} = modifyCompletedRows(newVirtualBoard, 4)
+        //2. check columns (with checked rows board)
+        const modifiedBoard = modifyCompletedColumns(newBoardModifiedRows, completedColums, 4)
+        
+        onSetBoard(modifiedBoard);
+        dispatch(setVirtualBoard(modifiedBoard));
     }
 
     /**
@@ -502,7 +511,7 @@ function Cell({
          * za vsak upseno commitan shape dodamo tocke
          */
         dispatch(addToScore(points.commitShape));
-        dispatch(disableMulligan())
+        // dispatch(disableMulligan())
 
         if (isRowComplete(virtualBoard) && columnComplete.isComplete) {
             /**
@@ -510,12 +519,12 @@ function Cell({
              */
 
             // zbrise vrstice
-            const { newBoardDeletedRows, numberOfCompletedRows } =
-                deleteCompletedRows(virtualBoard);
+            const { newBoardModifiedRows, numberOfCompletedRows } =
+                modifyCompletedRows(virtualBoard);
             
             // zbrise se stolpce
-            const newBoardDeletedAllCompleted = deleteCompletedColumns(
-                newBoardDeletedRows,
+            const newBoardDeletedAllCompleted = modifyCompletedColumns(
+                newBoardModifiedRows,
                 completedColums,
             );
             dispatchAllBoardsState(newBoardDeletedAllCompleted);
@@ -536,9 +545,9 @@ function Cell({
             /**
              * Zbrise vrstice ko so le te polne
              */
-            const { newBoardDeletedRows, numberOfCompletedRows } =
-                deleteCompletedRows(virtualBoard);
-            dispatchAllBoardsState(newBoardDeletedRows);
+            const { newBoardModifiedRows, numberOfCompletedRows } =
+                modifyCompletedRows(virtualBoard);
+            dispatchAllBoardsState(newBoardModifiedRows);
             dispatch(
                 addToScore(
                     points.completed * numberOfCompletedRows +
@@ -550,7 +559,7 @@ function Cell({
             /**
              * Zbrise stolpce ko se le ti polni
              */
-            const newBoardDeletedColumns = deleteCompletedColumns(
+            const newBoardDeletedColumns = modifyCompletedColumns(
                 virtualBoard,
                 completedColums,
             );
@@ -616,7 +625,7 @@ function Cell({
             onClick={commitShape}
             onMouseEnter={displayShape}
             onMouseLeave={clearCells}
-            className="border h-13 w-13"
+            className="border-t border-l rounded-[0.7rem] border-stone-300 h-13 w-13 cursor-grabbing"
             style={{ backgroundColor: color }}
         ></div>
     );

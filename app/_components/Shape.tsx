@@ -27,7 +27,7 @@ function Shape({ shape, index }: ShapeProps) {
     return (
         <div
             onClick={handleClick}
-            className="grid"
+            className="grid cursor-grab"
             style={{
                 gridTemplateColumns: `repeat(${shapeWidth}, minmax(0, 1fr))`,
             }}

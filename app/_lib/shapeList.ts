@@ -287,7 +287,7 @@ export const shapesList = [
         weight: 0.5,
         directions: [
             {
-                name: "big-00",
+                name: "Lbig-00",
                 template: [
                     [0, 0, 1],
                     [0, 0, 1],
