@@ -16,6 +16,7 @@ function Board() {
                 return "var(--overlap)";
             case 4:
                 return "var(--complete)";
+            case 5: return "var(--bomb)"    
             case 0:
                 return "var(--empty)";
             default:

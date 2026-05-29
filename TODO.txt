@@ -1,0 +1,10 @@
+TODO ko je gameover, odstrani "Zavrti" gumb
+TODO ko kliknes "Zavrti" ponovno evaluiraj board
+TODO aktivne arsenal gumb
+TODO disable css arsenal gumbov
+TODO arsenal lahko uporabis samo ko imas 3 like na izbiro
+BUG  ko je izbrana bomba, ne sme cekirat za polne linije
+
+
+DONE
+TODO omeji capaciteto arsenala

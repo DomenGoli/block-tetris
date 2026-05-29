@@ -10,7 +10,8 @@
     --complete: #2bf381;
     --choices: #bb4d00;
     --selected: #fe9a00;
-}
+    --bomb: #363535;
+};
 
 @theme inline {
     --color-background: var(--background);

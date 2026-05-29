@@ -1,12 +1,13 @@
 import { Dispatch, SetStateAction, useRef, useState } from "react";
 import {
     commitBoard,
+    selectBomb,
     selectShape,
     setIndex,
     setVirtualBoard,
 } from "../_lib/redux/boardSlice";
 import { useAppDispatch, useAppSelector } from "../_lib/redux/hooks";
-import {  disableMulligan, enableMulligan, populatePool } from "../_lib/redux/choicesSlice";
+import { disableMulligan, enableMulligan, populatePool } from "../_lib/redux/choicesSlice";
 import { getRandomShapes } from "../_lib/helper";
 import {
     changeBoardColor,
@@ -15,9 +16,12 @@ import {
     isColumnComplete,
     isRowComplete,
     isSnapshotFreeSpace,
+    deployBomb,
 } from "../_lib/boardFunctions";
 import { points } from "../_lib/pointsConfig";
 import { addToScore, setIsGameOver, updateHighScore } from "../_lib/redux/gameSlice";
+import { changeBombInventory } from "../_lib/redux/arsenalSlice";
+import { bombList } from "../_lib/bombList";
 
 type CoordsType = {
     x: number;
@@ -48,9 +52,11 @@ function Cell({
         virtualBoard,
         commitedBoard,
         index,
+        isBombSelected
     } = useAppSelector((store) => store.board);
     const { pool } = useAppSelector((store) => store.choices);
-    const {score, highScore} = useAppSelector(store=> store.game)
+    const {score, highScore, isGameOver} = useAppSelector(store=> store.game)
+    const {inventar} = useAppSelector(store => store.arsenal)
     const [isOverlap, setIsOverlap] = useState(false);
 
     const activeShapeWidth = activeShape.template[0].length;
@@ -144,6 +150,7 @@ function Cell({
     }
 
     function displayShape() {
+        if(isGameOver) return
         setIsOverlap(false);
         if (activeShape.name === "blank") return;
 
@@ -160,6 +167,7 @@ function Cell({
                         setIsOverlap(true);
                         return 3;
                     }
+                    if(isBombSelected) return 5
                     return 2;
                 } else {
                     return isCommitedBoardOccupied(boardRow, boardColumn);
@@ -167,11 +175,64 @@ function Cell({
             }
 
             // Top Left Corner
+            if(
+                coords.y <= 3 &&
+                coords.x <= 3 &&
+                activeShapeWidth > 4 &&
+                activeShapeHight > 4
+            ) {
+                return row.map((_, x) => {
+                    if (y === 0) {
+                        if (x === 0) return isShapeBlock(0, 0, y, x);
+                        if (x === 1) return isShapeBlock(0, 1, y, x);
+                        if (x === 2) return isShapeBlock(0, 2, y, x);
+                        if (x === 3) return isShapeBlock(0, 3, y, x);
+                        if (x === 4) return isShapeBlock(0, 4, y, x);
+                        else return isCommitedBoardOccupied(y, x);
+                    }
+                    if (y === 1) {
+                        if (x === 0) return isShapeBlock(1, 0, y, x);
+                        if (x === 1) return isShapeBlock(1, 1, y, x);
+                        if (x === 2) return isShapeBlock(1, 2, y, x);
+                        if (x === 3) return isShapeBlock(1, 3, y, x);
+                        if (x === 4) return isShapeBlock(1, 4, y, x);
+                        else return isCommitedBoardOccupied(y, x);
+                    }
+                    if (y === 2) {
+                        if (x === 0) return isShapeBlock(2, 0, y, x);
+                        if (x === 1) return isShapeBlock(2, 1, y, x);
+                        if (x === 2) return isShapeBlock(2, 2, y, x);
+                        if (x === 3) return isShapeBlock(2, 3, y, x);
+                        if (x === 4) return isShapeBlock(2, 4, y, x);
+                        else return isCommitedBoardOccupied(y, x);
+                    }
+                    if (y === 3) {
+                        if (x === 0) return isShapeBlock(3, 0, y, x);
+                        if (x === 1) return isShapeBlock(3, 1, y, x);
+                        if (x === 2) return isShapeBlock(3, 2, y, x);
+                        if (x === 3) return isShapeBlock(3, 3, y, x);
+                        if (x === 4) return isShapeBlock(3, 4, y, x);
+                        else return isCommitedBoardOccupied(y, x);
+                    }
+                    if (y === 4) {
+                        if (x === 0) return isShapeBlock(4, 0, y, x);
+                        if (x === 1) return isShapeBlock(4, 1, y, x);
+                        if (x === 2) return isShapeBlock(4, 2, y, x);
+                        if (x === 3) return isShapeBlock(4, 3, y, x);
+                        if (x === 4) return isShapeBlock(4, 4, y, x);
+                        else return isCommitedBoardOccupied(y, x);
+                    }
+                    else return isCommitedBoardOccupied(y, x);
+                })
+            }
+
             if (
                 coords.y <= 1 &&
                 coords.x <= 1 &&
                 activeShapeWidth > 1 &&
-                activeShapeHight > 1
+                activeShapeHight > 1 &&
+                activeShapeHight < 5 &&
+                activeShapeWidth < 5
             ) {
                 return row.map((_, x) => {
                     if (y === 0) {
@@ -204,7 +265,15 @@ function Cell({
                         if (x === 1) return isShapeBlock(3, 1, y, x);
                         if (x === 2) return isShapeBlock(3, 2, y, x);
                         else return isCommitedBoardOccupied(y, x);
-                    } else return isCommitedBoardOccupied(y, x);
+                    }
+                    if (y === 5) {
+                        if (x === 0) return isShapeBlock(3, 0, y, x);
+                        if (x === 1) return isShapeBlock(3, 1, y, x);
+                        if (x === 2) return isShapeBlock(3, 2, y, x);
+                        if (x === 3) return isShapeBlock(3, 2, y, x);
+                        else return isCommitedBoardOccupied(y, x);
+                    }
+                    else return isCommitedBoardOccupied(y, x);
                 });
             }
 
@@ -213,42 +282,47 @@ function Cell({
                 return row.map((_, x) => {
                     if (y === 0) {
                         if (x === coords.x) return isShapeBlock(0, -1, y, x);
-                        if (x === coords.x - 1)
-                            return isShapeBlock(0, -2, y, x);
-                        if (x === coords.x - 2)
-                            return isShapeBlock(0, -3, y, x);
+                        if (x === coords.x - 1) return isShapeBlock(0, -2, y, x);
+                        if (x === coords.x - 2) return isShapeBlock(0, -3, y, x);
+                        if (x === coords.x - 3) return isShapeBlock(0, -4, y, x);
+                        if (x === coords.x - 4) return isShapeBlock(0, -5, y, x);
+                            
                         else return isCommitedBoardOccupied(y, x);
                     }
                     if (y === 1) {
                         if (x === coords.x) return isShapeBlock(1, -1, y, x);
-                        if (x === coords.x - 1)
-                            return isShapeBlock(1, -2, y, x);
-                        if (x === coords.x - 2)
-                            return isShapeBlock(1, -3, y, x);
+                        if (x === coords.x - 1) return isShapeBlock(1, -2, y, x);
+                        if (x === coords.x - 2) return isShapeBlock(1, -3, y, x);
+                        if (x === coords.x - 3) return isShapeBlock(1, -4, y, x);
+                        if (x === coords.x - 4) return isShapeBlock(1, -5, y, x);
+                            
                         else return isCommitedBoardOccupied(y, x);
                     }
                     if (y === 2) {
                         if (x === coords.x) return isShapeBlock(2, -1, y, x);
-                        if (x === coords.x - 1)
-                            return isShapeBlock(2, -2, y, x);
-                        if (x === coords.x - 2)
-                            return isShapeBlock(2, -3, y, x);
+                        if (x === coords.x - 1) return isShapeBlock(2, -2, y, x);
+                        if (x === coords.x - 2) return isShapeBlock(2, -3, y, x);
+                        if (x === coords.x - 3) return isShapeBlock(2, -4, y, x);
+                        if (x === coords.x - 4) return isShapeBlock(2, -5, y, x);
+                            
                         else return isCommitedBoardOccupied(y, x);
                     }
                     if (y === 3) {
                         if (x === coords.x) return isShapeBlock(3, -1, y, x);
-                        if (x === coords.x - 1)
-                            return isShapeBlock(3, -2, y, x);
-                        if (x === coords.x - 2)
-                            return isShapeBlock(3, -3, y, x);
+                        if (x === coords.x - 1) return isShapeBlock(3, -2, y, x);
+                        if (x === coords.x - 2) return isShapeBlock(3, -3, y, x);
+                        if (x === coords.x - 3) return isShapeBlock(3, -4, y, x);
+                        if (x === coords.x - 4) return isShapeBlock(3, -5, y, x);
+                            
                         else return isCommitedBoardOccupied(y, x);
                     }
                     if (y === 4) {
                         if (x === coords.x) return isShapeBlock(4, -1, y, x);
-                        if (x === coords.x - 1)
-                            return isShapeBlock(3, -2, y, x);
-                        if (x === coords.x - 2)
-                            return isShapeBlock(3, -3, y, x);
+                        if (x === coords.x - 1) return isShapeBlock(4, -2, y, x);
+                        if (x === coords.x - 2) return isShapeBlock(4, -3, y, x);
+                        if (x === coords.x - 3) return isShapeBlock(4, -4, y, x);
+                        if (x === coords.x - 4) return isShapeBlock(4, -5, y, x);
+                            
                         else return isCommitedBoardOccupied(y, x);
                     } else return isCommitedBoardOccupied(y, x);
                 });
@@ -264,6 +338,46 @@ function Cell({
                             if (x === 2) return isShapeBlock(-1, -3, y, x);
                             if (x === 3) return isShapeBlock(-1, -2, y, x);
                             if (x === 4) return isShapeBlock(-1, -1, y, x);
+                            else return isCommitedBoardOccupied(y, x);
+                        });
+                    }
+                    if (y === coords.y - 1) {
+                        return row.map((cell, x) => {
+                            if (x === 0) return isShapeBlock(-2, -5, y, x);
+                            if (x === 1) return isShapeBlock(-2, -4, y, x);
+                            if (x === 2) return isShapeBlock(-2, -3, y, x);
+                            if (x === 3) return isShapeBlock(-2, -2, y, x);
+                            if (x === 4) return isShapeBlock(-2, -1, y, x);
+                            else return isCommitedBoardOccupied(y, x);
+                        });
+                    }
+                    if (y === coords.y - 2) {
+                        return row.map((cell, x) => {
+                            if (x === 0) return isShapeBlock(-3, -5, y, x);
+                            if (x === 1) return isShapeBlock(-3, -4, y, x);
+                            if (x === 2) return isShapeBlock(-3, -3, y, x);
+                            if (x === 3) return isShapeBlock(-3, -2, y, x);
+                            if (x === 4) return isShapeBlock(-3, -1, y, x);
+                            else return isCommitedBoardOccupied(y, x);
+                        });
+                    }
+                    if (y === coords.y - 3) {
+                        return row.map((cell, x) => {
+                            if (x === 0) return isShapeBlock(-4, -5, y, x);
+                            if (x === 1) return isShapeBlock(-4, -4, y, x);
+                            if (x === 2) return isShapeBlock(-4, -3, y, x);
+                            if (x === 3) return isShapeBlock(-4, -2, y, x);
+                            if (x === 4) return isShapeBlock(-4, -1, y, x);
+                            else return isCommitedBoardOccupied(y, x);
+                        });
+                    }
+                    if (y === coords.y - 4) {
+                        return row.map((cell, x) => {
+                            if (x === 0) return isShapeBlock(-5, -5, y, x);
+                            if (x === 1) return isShapeBlock(-5, -4, y, x);
+                            if (x === 2) return isShapeBlock(-5, -3, y, x);
+                            if (x === 3) return isShapeBlock(-5, -2, y, x);
+                            if (x === 4) return isShapeBlock(-5, -1, y, x);
                             else return isCommitedBoardOccupied(y, x);
                         });
                     }
@@ -446,7 +560,65 @@ function Cell({
                     });
                 } else return row;
             }
-            if (activeShapeWidth === 5) {
+            if (activeShapeWidth === 5 && activeShapeHight > 1) {
+                if (y === coords.y) {
+                    return row.map((_, x) => {
+                        if (x === coords.x) return isShapeBlock(-1, -1, y, x);
+                        if (x === coords.x - 1) return isShapeBlock(-1, -2, y, x);
+                        if (x === coords.x - 2) return isShapeBlock(-1, -3, y, x);
+                        if (x === coords.x - 3) return isShapeBlock(-1, -4, y, x);
+                        if (x === coords.x - 4) return isShapeBlock(-1, -5, y, x);
+                            
+                        else return isCommitedBoardOccupied(y, x);
+                    });
+                }
+                if (y === coords.y - 1) {
+                    return row.map((_, x) => {
+                        if (x === coords.x) return isShapeBlock(-2, -1, y, x);
+                        if (x === coords.x - 1) return isShapeBlock(-2, -2, y, x);
+                        if (x === coords.x - 2) return isShapeBlock(-2, -3, y, x);
+                        if (x === coords.x - 3) return isShapeBlock(-2, -4, y, x);
+                        if (x === coords.x - 4) return isShapeBlock(-2, -5, y, x);
+
+                        else return isCommitedBoardOccupied(y, x);
+                    });
+                }
+                if (y === coords.y - 2) {
+                    return row.map((_, x) => {
+                        if (x === coords.x) return isShapeBlock(-3, -1, y, x);
+                        if (x === coords.x - 1) return isShapeBlock(-3, -2, y, x);
+                        if (x === coords.x - 2) return isShapeBlock(-3, -3, y, x);
+                        if (x === coords.x - 3) return isShapeBlock(-3, -4, y, x);
+                        if (x === coords.x - 4) return isShapeBlock(-3, -5, y, x);
+                            
+                        else return isCommitedBoardOccupied(y, x);
+                    });
+                }
+                if (y === coords.y - 3) {
+                    return row.map((_, x) => {
+                        if (x === coords.x) return isShapeBlock(-4, -1, y, x);
+                        if (x === coords.x - 1) return isShapeBlock(-4, -2, y, x);
+                        if (x === coords.x - 2) return isShapeBlock(-4, -3, y, x);
+                        if (x === coords.x - 3) return isShapeBlock(-4, -4, y, x);
+                        if (x === coords.x - 4) return isShapeBlock(-4, -5, y, x);
+                            
+                        else return isCommitedBoardOccupied(y, x);
+                    });
+                }
+                if (y === coords.y - 4) {
+                    return row.map((_, x) => {
+                        if (x === coords.x) return isShapeBlock(-5, -1, y, x);
+                        if (x === coords.x - 1) return isShapeBlock(-5, -2, y, x);
+                        if (x === coords.x - 2) return isShapeBlock(-5, -3, y, x);
+                        if (x === coords.x - 3) return isShapeBlock(-5, -4, y, x);
+                        if (x === coords.x - 4) return isShapeBlock(-5, -5, y, x);
+                            
+                        else return isCommitedBoardOccupied(y, x);
+                    });
+                }
+            }
+
+            if (activeShapeWidth === 5 && activeShapeHight === 1) {
                 if (y === coords.y) {
                     return row.map((_, x) => {
                         if (x === coords.x) return isShapeBlock(0, -1, y, x);
@@ -461,7 +633,8 @@ function Cell({
                         else return isCommitedBoardOccupied(y, x);
                     });
                 } else return row;
-            } else return row;
+            } 
+            else return row;
         });
         const columnComplete = isColumnComplete(newVirtualBoard);
         const completedColums = columnComplete.columns;
@@ -471,8 +644,14 @@ function Cell({
         //2. check columns (with checked rows board)
         const modifiedBoard = modifyCompletedColumns(newBoardModifiedRows, completedColums, 4)
         
-        onSetBoard(modifiedBoard);
-        dispatch(setVirtualBoard(modifiedBoard));
+        if(isBombSelected) {
+            onSetBoard(newVirtualBoard);
+            dispatch(setVirtualBoard(newVirtualBoard));
+        }
+        else {
+            onSetBoard(modifiedBoard);
+            dispatch(setVirtualBoard(modifiedBoard));
+        }
     }
 
     /**
@@ -480,6 +659,7 @@ function Cell({
      * @function clearCells
      */
     function clearCells() {
+        if(isGameOver) return
         onSetBoard(commitedBoard);
         dispatch(setVirtualBoard(commitedBoard));
     }
@@ -493,7 +673,6 @@ function Cell({
          * Clause guards
          */
         if(activeShape.name === "blank") return
-        if (isOverlap) return;
 
         const blankShape = {
             name: "blank",
@@ -502,6 +681,65 @@ function Cell({
                 [0, 0],
             ],
         };
+
+        if(isBombSelected){
+            const newBoard = deployBomb(virtualBoard)
+            dispatchAllBoardsState(newBoard)
+            dispatch(selectShape(blankShape))
+            dispatch(selectBomb(false))
+            dispatch(changeBombInventory(activeShape.name, -1))
+
+            /**
+            * ce zbrisemo vse blocke iz boarda, dobimo dodatni Full Clear Bonus
+            */
+            if (boardRef.current.flat().every((el: number) => el === 0)) {
+                dispatch(addToScore(points.fullClearBonus));
+                if(inventar.nuke < bombList.find(bomb=>bomb.name === "nuke")!.capacity)
+                    dispatch(changeBombInventory("nuke", 1))
+            }
+
+            return
+        }
+        
+        function addToInventoryCascading(index:number) {
+            const bombsIndex = ["grenade", "shell", "rocket", "cluster", "nuke"]
+            const bombCapacity = bombList.find(bomb=>bomb.name === bombsIndex[index])!.capacity
+            const nextBombCapacity = bombList.find(bomb=>bomb.name === bombsIndex[index+1])!.capacity
+
+            if(inventar[bombsIndex[index]] === bombCapacity) {
+                if(inventar[bombsIndex[index+1]] === nextBombCapacity) {
+                    dispatch(changeBombInventory(bombsIndex[index], -bombCapacity)); 
+                    addToInventoryCascading(index+1)
+                }
+                else {
+                    dispatch(changeBombInventory(bombsIndex[index+1], 1));
+                    dispatch(changeBombInventory(bombsIndex[index], -bombCapacity)); 
+                }
+            }
+            else dispatch(changeBombInventory(bombsIndex[index], 1))
+        }
+
+        if (isOverlap) return;
+
+        function manageArsenalInventory(completedLines:number){
+            switch(completedLines) {
+                case(2):
+                    addToInventoryCascading(completedLines-2)
+                    break;
+                case(3): 
+                    addToInventoryCascading(completedLines-2)
+                    break;
+                case(4): 
+                    addToInventoryCascading(completedLines-2)
+                    break;
+                case(5): 
+                    addToInventoryCascading(completedLines-2)
+                    break;
+                default: return
+            }
+        }
+
+        
 
         const columnComplete = isColumnComplete(virtualBoard);
         const completedColums = columnComplete.columns;
@@ -540,6 +778,8 @@ function Cell({
                             points.multiBonus,
                 ),
             );
+            manageArsenalInventory(numberOfCompletedRows+numberOfCompletedColumns)
+            
             
         } else if (isRowComplete(virtualBoard)) {
             /**
@@ -554,6 +794,7 @@ function Cell({
                         (numberOfCompletedRows - 1) * points.multiBonus,
                 ),
             );
+            manageArsenalInventory(numberOfCompletedRows)
 
         } else if (columnComplete.isComplete) {
             /**
@@ -570,7 +811,7 @@ function Cell({
                         (numberOfCompletedColumns - 1) * points.multiBonus,
                 ),
             );
-            
+            manageArsenalInventory(numberOfCompletedColumns)
         } else {
             /**
              * primer ko ni bilo polnih vrsic ali stolpcev
@@ -596,15 +837,21 @@ function Cell({
         /**
          * ce zbrisemo vse blocke iz boarda, dobimo dodatni Full Clear Bonus
          */
-        if (boardRef.current.flat().every((el: number) => el === 0))
+        if (boardRef.current.flat().every((el: number) => el === 0)) {
             dispatch(addToScore(points.fullClearBonus));
-
+            if(inventar.nuke < bombList.find(bomb=>bomb.name === "nuke")!.capacity)
+                dispatch(changeBombInventory("nuke", 1))
+        }
         /**]
          * chackira ce je na boardu prostora za nase like, drugace konca igro in checkira highscore
          */
         if (!CheckIsFreeSpace()) {
             if (score > highScore) dispatch(updateHighScore());
             dispatch(setIsGameOver(true));
+            dispatch(disableMulligan())
+            boardRef.current = changeBoardColor(virtualBoard,3)
+            onSetBoard(changeBoardColor(virtualBoard,3));
+            dispatch(setVirtualBoard(changeBoardColor(virtualBoard,3)));
         }
     }
 

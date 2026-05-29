@@ -11,6 +11,7 @@ type InitialStateType = {
     virtualBoard: Array<number>[];
     activeShape: ShapeProps;
     index:number | null;
+    isBombSelected: boolean;
 };
 
 const initialState: InitialStateType = {
@@ -42,6 +43,7 @@ const initialState: InitialStateType = {
         ],
     },
     index: null,
+    isBombSelected: false,
 };
 
 //Reducer
@@ -63,10 +65,24 @@ const boardSlice = createSlice({
         },
         resetBoard(){
             return {...initialState}
+        },
+        selectBomb(state, action){
+            state.isBombSelected = action.payload
+        },
+        clearSelection(state){
+            state.activeShape = {
+                name: "blank",
+                template: [
+                    [0, 0],
+                    [0, 0]
+                ],
+            }
         }
+
+        
     },
 });
 
 //Exports
 export default boardSlice.reducer;
-export const {selectShape, setVirtualBoard, commitBoard, setIndex, resetBoard} = boardSlice.actions;
+export const {selectShape, setVirtualBoard, commitBoard, setIndex, resetBoard, selectBomb, clearSelection} = boardSlice.actions;

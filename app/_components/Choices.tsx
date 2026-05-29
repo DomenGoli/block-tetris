@@ -15,7 +15,10 @@ function Choices() {
     };
 
     return (
-        <div className="flex flex-col items-center gap-5">
+        <div className="flex flex-col items-center gap-4">
+            <div className="h-[50px]">
+            {isMulliganActive && <Mulligan />}
+            </div>
             <div className="flex flex-wrap gap-5">
                 <div>
                     <Shape shape={pool[0] || blankShape} index={0} />
@@ -27,7 +30,6 @@ function Choices() {
                     <Shape shape={pool[2] || blankShape} index={2} />
                 </div>
             </div>
-            {isMulliganActive && <Mulligan />}
         </div>
     );
 }

@@ -5,10 +5,12 @@ export function isRowComplete(board: number[][]): boolean {
         return false;
     }
 
-export function changeBoardColor(board: number[][]) {
+
+
+export function changeBoardColor(board: number[][], color=1) {
         const resBoard = board.map((row) => {
             return row.map((cell) => {
-                if (cell !== 0) return 1;
+                if (cell !== 0) return color;
                 else return 0;
             });
         });
@@ -90,6 +92,14 @@ export function modifyCompletedColumns(board: number[][], completedColumns: numb
     })
 }
 
+export function deployBomb(board: number[][]): number[][] {
+    return board.map(row => {
+        return row.map(cell=> {
+            if(cell === 5 || cell ===3) return 0
+            else return cell
+        })
+    })
+}
 
 
 

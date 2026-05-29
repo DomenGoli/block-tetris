@@ -1,4 +1,4 @@
-import { selectShape, setIndex } from "../_lib/redux/boardSlice";
+import { selectBomb, selectShape, setIndex } from "../_lib/redux/boardSlice";
 import { useAppDispatch, useAppSelector } from "../_lib/redux/hooks";
 import Block from "./Block";
 import InvisableBlock from "./InvisableBlock";
@@ -22,6 +22,7 @@ function Shape({ shape, index }: ShapeProps) {
 
         dispatch(selectShape(shape));
         dispatch(setIndex(index));
+        dispatch(selectBomb(false))
     }
     const shapeWidth = shape.template[0].length;
     return (
