@@ -10,6 +10,7 @@ import { getRandomShapes } from "../_lib/helper";
 import { resetBoard } from "../_lib/redux/boardSlice";
 import { resetGame } from "../_lib/redux/gameSlice";
 import Arsenal from "./Arsenal";
+import { resetBombs } from "../_lib/redux/arsenalSlice";
 
 function Game() {
     const [rerenderBoard, forceRerenderBoard] = useState(Math.random);
@@ -23,6 +24,7 @@ function Game() {
         dispatch(enableMulligan())
         dispatch(resetGame());
         dispatch(resetBoard());
+        dispatch(resetBombs())
         forceRerenderBoard(Math.random())
 
     }
